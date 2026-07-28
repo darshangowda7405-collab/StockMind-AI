@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.models.user import User
-from app.schemas.user import UserRegister, UserLogin
+from app.schemas.user import UserRegister
 
 from app.core.security import (
     hash_password,
@@ -13,7 +13,6 @@ from app.core.auth import create_access_token
 
 def register_user(db: Session, user: UserRegister):
 
-    # Check if email already exists
     existing_user = (
         db.query(User)
         .filter(User.email == user.email)
@@ -23,7 +22,6 @@ def register_user(db: Session, user: UserRegister):
     if existing_user:
         raise ValueError("Email already registered.")
 
-    # Create new user
     new_user = User(
         full_name=user.full_name,
         email=user.email,
@@ -38,11 +36,15 @@ def register_user(db: Session, user: UserRegister):
     return new_user
 
 
-def login_user(db: Session, credentials: UserLogin):
+def login_user(
+    db: Session,
+    email: str,
+    password: str,
+):
 
     user = (
         db.query(User)
-        .filter(User.email == credentials.email)
+        .filter(User.email == email)
         .first()
     )
 
@@ -50,7 +52,7 @@ def login_user(db: Session, credentials: UserLogin):
         raise ValueError("Invalid email or password.")
 
     if not verify_password(
-        credentials.password,
+        password,
         user.hashed_password,
     ):
         raise ValueError("Invalid email or password.")

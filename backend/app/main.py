@@ -8,7 +8,7 @@ from app.database.database import engine
 
 # Import models so SQLAlchemy creates tables
 from app.models import User, Stock
-
+from app.api.dashboard import router as dashboard_router
 # API Routers
 from app.api.stocks import router as stock_router
 from app.api.prediction import router as prediction_router
@@ -39,7 +39,7 @@ app.include_router(stock_router)
 app.include_router(prediction_router)
 app.include_router(chart_router)
 app.include_router(auth_router)
-
+app.include_router(dashboard_router)
 
 @app.get("/")
 def root():
