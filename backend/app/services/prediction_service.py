@@ -7,7 +7,8 @@ from app.services.advisor_service import AdvisorService
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 
-MODEL = joblib.load(BASE_DIR / "ml" / "models" / "stock_model.pkl")
+MODEL = joblib.load(BASE_DIR / "ml" / "stock_model.pkl")
+
 FEATURES = joblib.load(BASE_DIR / "ml" / "feature_columns.pkl")
 
 class PredictionService:
