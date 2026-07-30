@@ -1,13 +1,14 @@
 import joblib
+from pathlib import Path
 import yfinance as yf
 
 from app.utils.indicators import add_indicators
 from app.services.advisor_service import AdvisorService
 
+BASE_DIR = Path(__file__).resolve().parents[1]
 
-MODEL = joblib.load("app/ml/stock_model.pkl")
-FEATURES = joblib.load("app/ml/feature_columns.pkl")
-
+MODEL = joblib.load(BASE_DIR / "ml" / "models" / "stock_model.pkl")
+FEATURES = joblib.load(BASE_DIR / "ml" / "feature_columns.pkl")
 
 class PredictionService:
 
