@@ -26,7 +26,7 @@ from app.api.alert import router as alert_router
 
 
 # Create database tables
-# Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title=settings.APP_NAME,
