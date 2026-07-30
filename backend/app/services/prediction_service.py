@@ -17,10 +17,24 @@ class PredictionService:
         df = yf.download(
             symbol,
             period="1y",
-            auto_adjust=False
+            auto_adjust=False,
+            progress=False,
         )
 
+        if df.empty:
+            return None
+
+        # Flatten MultiIndex columns returned by yfinance
+        if hasattr(df.columns, "nlevels") and df.columns.nlevels > 1:
+            df.columns = df.columns.get_level_values(0)
+
         df = add_indicators(df)
+
+        # Remove rows where indicators aren't available yet
+        df = df.dropna()
+
+        if df.empty:
+            return None
 
         latest = df.iloc[-1]
 

@@ -2,6 +2,9 @@ from fastapi import APIRouter, HTTPException
 
 from app.services.market_service import MarketService
 from app.services.stock_service import StockService
+from fastapi.encoders import jsonable_encoder
+import numpy as np
+import pandas as pd
 
 router = APIRouter(
     prefix="/stocks",
@@ -38,4 +41,37 @@ def history(
             detail="History not found",
         )
 
-    return history.to_dict(orient="records")
+    # Replace invalid float values
+    history = history.replace([np.inf, -np.inf], np.nan)
+    history = history.astype(object)
+    history = history.where(pd.notna(history), None)
+    
+    print(history.isna().sum())
+    print(history.dtypes)
+    
+    
+
+    import math
+
+    records = history.to_dict(orient="records")
+
+    print("\n========== CHECKING RECORDS ==========")
+
+    bad_found = False
+
+    for i, row in enumerate(records):
+        for key, value in row.items():
+            if isinstance(value, float):
+                if math.isnan(value):
+                    print(f"NaN  -> Row {i}, Column {key}")
+                    bad_found = True
+                elif math.isinf(value):
+                    print(f"INF  -> Row {i}, Column {key}, Value={value}")
+                    bad_found = True
+
+    if not bad_found:
+        print("No NaN or Infinity found in records.")
+
+    print("=====================================\n")
+
+    return records

@@ -1,5 +1,6 @@
 import yfinance as yf
 import pandas as pd
+import numpy as np
 from app.utils.indicators import add_indicators
 
 
@@ -118,6 +119,9 @@ class MarketService:
                 progress=False,
             )
             
+            print("Downloaded shape:", df.shape)
+            print("Downloaded columns:", df.columns)
+            
             print(
                 f"Period={period}, Download={download_period}, "
                 f"Interval={interval}, Rows={len(df)}"
@@ -162,8 +166,12 @@ class MarketService:
             elif period == "1y":
                 df = df.tail(252)
 
-            df = df.reset_index()
+            # Clean invalid values before returning
+            df = df.replace([np.inf, -np.inf], np.nan)
+            df = df.astype(object)
+            df = df.where(pd.notna(df), None)
 
+            df = df.reset_index()
             # Use a consistent "Date" field for the frontend
             if "Datetime" in df.columns:
                 df["Date"] = (
