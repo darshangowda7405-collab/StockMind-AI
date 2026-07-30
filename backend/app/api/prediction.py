@@ -1,23 +1,17 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 
 from app.schemas.prediction import PredictionResponse
-from app.services.prediction_service import predict_stock
+from app.services.prediction_service import PredictionService
 
 router = APIRouter(
     prefix="/prediction",
-    tags=["AI Prediction"]
+    tags=["Prediction"],
 )
 
 
-@router.get("/{symbol}", response_model=PredictionResponse)
-def get_prediction(symbol: str):
-
-    result = predict_stock(symbol)
-
-    if result is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Stock not found."
-        )
-
-    return result
+@router.get(
+    "/{symbol}",
+    response_model=PredictionResponse,
+)
+def predict(symbol: str):
+    return PredictionService.predict(symbol)

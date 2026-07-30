@@ -1,16 +1,29 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "@/components/layout/Sidebar";
-import Navbar from "@/components/layout/Navbar";
+import TopNavbar from "@/components/layout/TopNavbar";
 
 export default function MainLayout() {
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
+    <div className="min-h-screen bg-slate-50">
+
+      {/* Floating Sidebar */}
+
       <Sidebar />
 
-      <div className="ml-64 p-6">
-        <Navbar />
-        <Outlet />
-      </div>
+      {/* Main Content */}
+
+      <main className="ml-[300px] p-6">
+
+        <TopNavbar />
+
+        <div className="rounded-3xl">
+
+          <Outlet />
+
+        </div>
+
+      </main>
+
     </div>
   );
 }

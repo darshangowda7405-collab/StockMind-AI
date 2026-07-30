@@ -15,13 +15,36 @@ export interface LoginData {
   password: string;
 }
 
+// ----------------------------
+// Register
+// ----------------------------
 export const registerUser = async (data: RegisterData) => {
   const response = await API.post("/auth/register", data);
   return response.data;
 };
 
+// ----------------------------
+// Login
+// OAuth2PasswordRequestForm expects:
+// username
+// password
+// sent as x-www-form-urlencoded
+// ----------------------------
 export const loginUser = async (data: LoginData) => {
-  const response = await API.post("/auth/login", data);
+  const formData = new URLSearchParams();
+
+  formData.append("username", data.email);
+  formData.append("password", data.password);
+
+  const response = await API.post(
+    "/auth/login",
+    formData,
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }
+  );
 
   localStorage.setItem(
     "token",
@@ -31,10 +54,16 @@ export const loginUser = async (data: LoginData) => {
   return response.data;
 };
 
+// ----------------------------
+// Logout
+// ----------------------------
 export const logout = () => {
   localStorage.removeItem("token");
 };
 
+// ----------------------------
+// Get Token
+// ----------------------------
 export const getToken = () => {
   return localStorage.getItem("token");
 };

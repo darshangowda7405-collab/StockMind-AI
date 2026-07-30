@@ -5,6 +5,8 @@ import App from "@/App";
 import QueryProvider from "@/providers/QueryProvider";
 
 import "@/styles/global.css";
+import { Toaster } from "sonner";
+
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -13,3 +15,14 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     </QueryProvider>
   </React.StrictMode>
 );
+
+<React.StrictMode>
+  <QueryProvider>
+    <App />
+    <Toaster
+      position="top-right"
+      richColors
+      closeButton
+    />
+  </QueryProvider>
+</React.StrictMode>

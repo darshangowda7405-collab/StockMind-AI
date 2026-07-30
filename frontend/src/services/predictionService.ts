@@ -1,29 +1,17 @@
-import axios from "axios";
+import api from "./api";
 
-const API = axios.create({
-  baseURL: "http://127.0.0.1:8000",
-});
-
-export interface PredictionResponse {
+export interface Prediction {
   symbol: string;
-  company: string;
   current_price: number;
-
-  prediction: string;
-  confidence: number;
-
+  predicted_price: number;
+  change_percent: number;
   signal: string;
-  risk: string;
-
-  expected_return: number;
-
-  reasons: string[];
+  confidence: number;
 }
 
 export const getPrediction = async (
   symbol: string
-): Promise<PredictionResponse> => {
-  const response = await API.get(`/prediction/${symbol}`);
-
+): Promise<Prediction> => {
+  const response = await api.get(`/prediction/${symbol}`);
   return response.data;
 };

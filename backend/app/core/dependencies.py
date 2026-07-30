@@ -13,28 +13,31 @@ def get_current_user(
     token: str = Depends(oauth2_scheme),
     db: Session = Depends(get_db),
 ):
+    print("\n========== AUTH DEBUG ==========")
+    print("Received Token:", token)
+
     payload = verify_token(token)
+    print("Decoded Payload:", payload)
 
     if payload is None:
+        print("❌ Token verification failed")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired token",
         )
 
     email = payload.get("sub")
-
-    if email is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token payload",
-        )
+    print("Email:", email)
 
     user = db.query(User).filter(User.email == email).first()
+    print("User Found:", user)
 
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not found",
         )
+
+    print("========== AUTH SUCCESS ==========\n")
 
     return user

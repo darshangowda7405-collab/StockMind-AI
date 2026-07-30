@@ -1,80 +1,84 @@
 import joblib
-import pandas as pd
 import yfinance as yf
 
-from app.ml.indicators import calculate_indicators
-
-MODEL_PATH = "app/ml/models/stockmind_model.pkl"
-
-model = joblib.load(MODEL_PATH)
+from app.utils.indicators import add_indicators
+from app.services.advisor_service import AdvisorService
 
 
-def predict_stock(symbol: str):
+MODEL = joblib.load("app/ml/stock_model.pkl")
+FEATURES = joblib.load("app/ml/feature_columns.pkl")
 
-    stock = yf.Ticker(symbol)
 
-    info = stock.info
+class PredictionService:
 
-    history = stock.history(period="6mo", auto_adjust=True)
+    @staticmethod
+    def predict(symbol: str):
 
-    if history.empty:
-        return None
+        df = yf.download(
+            symbol,
+            period="1y",
+            auto_adjust=False
+        )
 
-    history = history[["Open", "High", "Low", "Close", "Volume"]].copy()
+        df = add_indicators(df)
 
-    history = calculate_indicators(history)
+        latest = df.iloc[-1]
 
-    history = history.dropna()
+        X = latest[FEATURES].to_frame().T
 
-    latest = history.iloc[-1]
+        predicted_price = float(MODEL.predict(X)[0])
 
-    features = pd.DataFrame([{
-        "SMA20": latest["SMA20"],
-        "SMA50": latest["SMA50"],
-        "EMA20": latest["EMA20"],
-        "RSI": latest["RSI"],
-        "MACD": latest["MACD"],
-        "UpperBand": latest["UpperBand"],
-        "LowerBand": latest["LowerBand"],
-        "Return": latest["Return"],
-        "Volatility": latest["Volatility"],
-    }])
+        current_price = float(latest["Close"])
 
-    prediction = model.predict(features)[0]
+        change_percent = (
+            (predicted_price - current_price)
+            / current_price
+        ) * 100
 
-    probability = model.predict_proba(features)[0]
+        if change_percent > 2:
+            signal = "BUY"
+        elif change_percent < -2:
+            signal = "SELL"
+        else:
+            signal = "HOLD"
 
-    confidence = round(float(max(probability)) * 100, 2)
+        confidence = round(
+            min(99, max(60, 100 - abs(change_percent) * 3)),
+            2,
+        )
 
-    if prediction == 1:
-        prediction_text = "Bullish"
-        signal = "BUY"
-    else:
-        prediction_text = "Bearish"
-        signal = "SELL"
+        trend = (
+            "Bullish"
+            if latest["SMA20"] > latest["SMA50"]
+            else "Bearish"
+        )
 
-    if confidence >= 90:
-        risk = "Low"
-    elif confidence >= 75:
-        risk = "Medium"
-    else:
-        risk = "High"
+        if latest["Volatility"] > 0.03:
+            risk = "High"
+        elif latest["Volatility"] > 0.015:
+            risk = "Medium"
+        else:
+            risk = "Low"
 
-    expected_return = round((confidence / 100) * 5, 2)
+        explanation = AdvisorService.generate(
+            current_price=current_price,
+            predicted_price=predicted_price,
+            rsi=float(latest["RSI"]),
+            macd=float(latest["MACD"]),
+            macd_signal=float(latest["MACD_SIGNAL"]),
+            sma20=float(latest["SMA20"]),
+            sma50=float(latest["SMA50"]),
+            volatility=float(latest["Volatility"]),
+        )
 
-    return {
-        "symbol": symbol.upper(),
-        "company": info.get("longName", symbol.upper()),
-        "current_price": round(float(latest["Close"]), 2),
-        "prediction": prediction_text,
-        "confidence": confidence,
-        "signal": signal,
-        "risk": risk,
-        "expected_return": expected_return,
-        "reasons": [
-            "RSI momentum analysed",
-            "MACD trend analysed",
-            "Moving averages analysed",
-            "Volatility analysed"
-        ]
-    }
+        return {
+            "symbol": symbol.upper(),
+            "current_price": round(current_price, 2),
+            "predicted_price": round(predicted_price, 2),
+            "change_percent": round(change_percent, 2),
+            "signal": signal,
+            "confidence": confidence,
+            "trend": trend,
+            "risk": risk,
+            "explanation": explanation,
+        }

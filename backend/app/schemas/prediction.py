@@ -1,17 +1,14 @@
+from typing import List
 from pydantic import BaseModel
 
 
 class PredictionResponse(BaseModel):
     symbol: str
-    company: str
     current_price: float
-
-    prediction: str
-    confidence: float
-
+    predicted_price: float
+    change_percent: float
     signal: str
+    confidence: float
+    trend: str
     risk: str
-
-    expected_return: float
-
-    reasons: list[str]
+    explanation: List[str]

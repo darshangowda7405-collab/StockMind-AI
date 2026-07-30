@@ -1,38 +1,109 @@
+from datetime import datetime, time
+
 import yfinance as yf
 
-
-def get_stock(symbol: str):
-    ticker = yf.Ticker(symbol)
-
-    info = ticker.info
-
-    return {
-        "symbol": info.get("symbol"),
-        "company": info.get("longName"),
-        "price": info.get("currentPrice"),
-        "currency": info.get("currency"),
-        "exchange": info.get("exchange"),
-        "sector": info.get("sector"),
-    }
+from app.services.market_service import MarketService
+from app.services.prediction_service import PredictionService
 
 
-def get_history(symbol: str, period: str = "6mo"):
-    ticker = yf.Ticker(symbol)
+class StockService:
 
-    history = ticker.history(period=period)
+    @staticmethod
+    def get_stock_details(symbol: str):
 
-    data = []
+        symbol = symbol.upper()
 
-    for date, row in history.iterrows():
-        data.append(
-            {
-                "date": date.strftime("%Y-%m-%d"),
-                "open": float(row["Open"]),
-                "high": float(row["High"]),
-                "low": float(row["Low"]),
-                "close": float(row["Close"]),
-                "volume": int(row["Volume"]),
-            }
+        # -----------------------------
+        # Live Quote
+        # -----------------------------
+        quote = MarketService.get_quote(symbol)
+
+        if quote is None:
+            return None
+
+        # -----------------------------
+        # Company Info
+        # -----------------------------
+        company = MarketService.get_company_info(symbol)
+
+        # -----------------------------
+        # Financial Information
+        # -----------------------------
+        ticker = yf.Ticker(symbol)
+        info = ticker.info
+
+        # -----------------------------
+        # AI Prediction
+        # -----------------------------
+        prediction = PredictionService.predict(symbol)
+
+        # -----------------------------
+        # Market Status
+        # -----------------------------
+        now = datetime.now().time()
+
+        market_state = (
+            "OPEN"
+            if time(9, 30) <= now <= time(16, 0)
+            else "CLOSED"
         )
 
-    return data
+        # -----------------------------
+        # News
+        # -----------------------------
+        news = []
+
+        try:
+            if hasattr(ticker, "news"):
+                for item in ticker.news[:5]:
+                    news.append(
+                        {
+                            "title": item.get("title", ""),
+                            "publisher": item.get("publisher", ""),
+                            "published_at": item.get("providerPublishTime", ""),
+                            "url": item.get("link", ""),
+                        }
+                    )
+        except Exception:
+            pass
+
+        # -----------------------------
+        # Response
+        # -----------------------------
+        return {
+            "company": {
+                "symbol": symbol,
+                "company": company.get("company"),
+                "sector": company.get("sector"),
+                "industry": company.get("industry"),
+                "country": company.get("country"),
+                "website": info.get("website", ""),
+            },
+            "price": {
+                "current_price": quote["price"],
+                "previous_close": round(
+                    quote["price"] - quote["change"], 2
+                ),
+                "change": quote["change"],
+                "change_percent": quote["change_percent"],
+                "currency": info.get("currency", "USD"),
+                "market_state": market_state,
+            },
+            "financials": {
+                "market_cap": info.get("marketCap", 0),
+                "pe_ratio": info.get("trailingPE"),
+                "forward_pe": info.get("forwardPE"),
+                "eps": info.get("trailingEps"),
+                "beta": info.get("beta"),
+                "dividend_yield": info.get("dividendYield"),
+                "volume": info.get("volume", 0),
+                "average_volume": info.get("averageVolume", 0),
+                "week_52_high": info.get("fiftyTwoWeekHigh", 0),
+                "week_52_low": info.get("fiftyTwoWeekLow", 0),
+            },
+            "prediction": prediction,
+            "news": news,
+        }
+        
+        
+        

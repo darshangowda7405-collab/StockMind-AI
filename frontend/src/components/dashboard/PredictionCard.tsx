@@ -1,4 +1,14 @@
-import { TrendingUp, ShieldAlert, Target } from "lucide-react";
+import {
+  TrendingUp,
+  ShieldAlert,
+  Target,
+  BrainCircuit,
+  ArrowUpRight,
+  ArrowDownRight,
+} from "lucide-react";
+
+import Card from "../ui/Card";
+import Badge from "../ui/Badge";
 
 interface PredictionCardProps {
   symbol: string;
@@ -21,66 +31,193 @@ export default function PredictionCard({
 }: PredictionCardProps) {
   const bullish = prediction === "Bullish";
 
+  const riskType =
+    risk === "Low"
+      ? "LOW"
+      : risk === "Medium"
+      ? "MEDIUM"
+      : "HIGH";
+
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-slate-400">{company}</p>
+    <Card className="relative overflow-hidden">
 
-          <h2 className="mt-2 text-4xl font-bold">{symbol}</h2>
+      {/* Glow */}
+
+      <div
+        className={`absolute right-0 top-0 h-56 w-56 rounded-full blur-3xl opacity-20 ${
+          bullish
+            ? "bg-emerald-500"
+            : "bg-red-500"
+        }`}
+      />
+
+      <div className="relative">
+
+        {/* Header */}
+
+        <div className="flex items-start justify-between">
+
+          <div>
+
+            <p className="text-slate-400">
+              {company}
+            </p>
+
+            <h1 className="mt-2 text-4xl font-bold tracking-tight">
+              {symbol}
+            </h1>
+
+          </div>
+
+          <Badge
+            type={bullish ? "BUY" : "SELL"}
+            text={bullish ? "BUY" : "SELL"}
+          />
+
         </div>
 
-        <span
-          className={`rounded-full px-5 py-2 text-sm font-semibold ${
-            bullish
-              ? "bg-green-500/20 text-green-400"
-              : "bg-red-500/20 text-red-400"
-          }`}
-        >
-          {prediction}
+        {/* Stats */}
+
+        <div className="mt-8 grid gap-5 md:grid-cols-3">
+
+          <MetricCard
+            icon={<Target size={22} />}
+            title="Confidence"
+            value={`${confidence}%`}
+          />
+
+          <MetricCard
+            icon={
+              bullish ? (
+                <ArrowUpRight size={22} />
+              ) : (
+                <ArrowDownRight size={22} />
+              )
+            }
+            title="Expected Return"
+            value={expectedReturn}
+          />
+
+          <MetricCard
+            icon={<ShieldAlert size={22} />}
+            title="Risk"
+            value={
+              <Badge
+                type={riskType}
+                text={risk}
+              />
+            }
+          />
+
+        </div>
+
+        {/* Confidence */}
+
+        <div className="mt-8">
+
+          <div className="mb-2 flex justify-between">
+
+            <span className="text-sm text-slate-400">
+              AI Confidence
+            </span>
+
+            <span className="font-semibold">
+              {confidence}%
+            </span>
+
+          </div>
+
+          <div className="h-3 overflow-hidden rounded-full bg-slate-800">
+
+            <div
+              className={`h-full rounded-full transition-all duration-700 ${
+                bullish
+                  ? "bg-emerald-400"
+                  : "bg-red-400"
+              }`}
+              style={{
+                width: `${confidence}%`,
+              }}
+            />
+
+          </div>
+
+        </div>
+
+        {/* Explanation */}
+
+        <div className="mt-10">
+
+          <div className="mb-5 flex items-center gap-2">
+
+            <BrainCircuit className="text-cyan-400" />
+
+            <h3 className="text-xl font-semibold">
+              AI Explanation
+            </h3>
+
+          </div>
+
+          <div className="space-y-4">
+
+            {reasons.map((reason) => (
+
+              <div
+                key={reason}
+                className="flex items-start gap-3 rounded-xl border border-white/5 bg-white/5 p-4"
+              >
+
+                <TrendingUp
+                  size={18}
+                  className="mt-0.5 text-cyan-400"
+                />
+
+                <p className="text-slate-300">
+                  {reason}
+                </p>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </Card>
+  );
+}
+
+function MetricCard({
+  icon,
+  title,
+  value,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  value: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-2xl border border-white/5 bg-white/5 p-5">
+
+      <div className="mb-3 flex items-center gap-2 text-cyan-400">
+
+        {icon}
+
+        <span className="text-sm font-medium">
+          {title}
         </span>
+
       </div>
 
-      <div className="mt-8 grid gap-6 md:grid-cols-3">
-        <div className="rounded-2xl bg-slate-900/70 p-5">
-          <div className="mb-3 flex items-center gap-2">
-            <Target size={20} />
-            <span>Confidence</span>
-          </div>
+      <div className="text-3xl font-bold">
 
-          <h3 className="text-3xl font-bold">{confidence}%</h3>
-        </div>
+        {value}
 
-        <div className="rounded-2xl bg-slate-900/70 p-5">
-          <div className="mb-3 flex items-center gap-2">
-            <TrendingUp size={20} />
-            <span>Expected Return</span>
-          </div>
-
-          <h3 className="text-3xl font-bold">{expectedReturn}</h3>
-        </div>
-
-        <div className="rounded-2xl bg-slate-900/70 p-5">
-          <div className="mb-3 flex items-center gap-2">
-            <ShieldAlert size={20} />
-            <span>Risk</span>
-          </div>
-
-          <h3 className="text-3xl font-bold">{risk}</h3>
-        </div>
       </div>
 
-      <div className="mt-8">
-        <h3 className="mb-4 text-xl font-semibold">
-          AI Explanation
-        </h3>
-
-        <ul className="space-y-3 text-slate-300">
-          {reasons.map((reason) => (
-            <li key={reason}>✔ {reason}</li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
 }

@@ -1,6 +1,5 @@
-from datetime import datetime, timedelta
 from jose import jwt, JWTError
-
+from datetime import datetime, timedelta
 from app.core.config import settings
 
 
@@ -21,10 +20,6 @@ def create_access_token(data: dict):
 
 
 def verify_token(token: str):
-    """
-    Verify JWT token and return the payload.
-    Returns None if the token is invalid or expired.
-    """
     try:
         payload = jwt.decode(
             token,
@@ -34,5 +29,10 @@ def verify_token(token: str):
 
         return payload
 
-    except JWTError:
+    except JWTError as e:
+        print("JWT ERROR:", e)
+        return None
+
+    except Exception as e:
+        print("UNKNOWN ERROR:", e)
         return None

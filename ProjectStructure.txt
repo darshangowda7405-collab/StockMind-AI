@@ -1,0 +1,205 @@
+StockMind-AI
+├── .dist
+├── assets
+├── backend
+│   ├── app
+│   │   ├── api
+│   │   │   ├── __init__.py
+│   │   │   ├── alert.py
+│   │   │   ├── auth.py
+│   │   │   ├── chart.py
+│   │   │   ├── dashboard.py
+│   │   │   ├── portfolio.py
+│   │   │   ├── prediction.py
+│   │   │   ├── search.py
+│   │   │   ├── stocks.py
+│   │   │   └── watchlist.py
+│   │   ├── core
+│   │   │   ├── auth.py
+│   │   │   ├── config.py
+│   │   │   ├── dependencies.py
+│   │   │   └── security.py
+│   │   ├── database
+│   │   │   ├── __init__.py
+│   │   │   ├── base.py
+│   │   │   └── database.py
+│   │   ├── ml
+│   │   │   ├── datasets
+│   │   │   ├── models
+│   │   │   │   ├── stockmind_model.pkl
+│   │   │   │   └── train.py
+│   │   │   ├── notebooks
+│   │   │   ├── prediction
+│   │   │   ├── preprocessing
+│   │   │   ├── training
+│   │   │   ├── utils
+│   │   │   ├── __init__.py
+│   │   │   ├── feature_columns.pkl
+│   │   │   ├── indicators.py
+│   │   │   ├── predict.py
+│   │   │   ├── stock_model.pkl
+│   │   │   ├── train.py
+│   │   │   └── train_model.py
+│   │   ├── models
+│   │   │   ├── __init__.py
+│   │   │   ├── alert.py
+│   │   │   ├── portfolio.py
+│   │   │   ├── stock.py
+│   │   │   ├── user.py
+│   │   │   └── watchlist.py
+│   │   ├── routes
+│   │   │   └── prediction.py
+│   │   ├── schemas
+│   │   │   ├── alert.py
+│   │   │   ├── dashboard.py
+│   │   │   ├── portfolio.py
+│   │   │   ├── prediction.py
+│   │   │   ├── stock.py
+│   │   │   ├── user.py
+│   │   │   └── watchlist.py
+│   │   ├── services
+│   │   │   ├── advisor_service.py
+│   │   │   ├── auth_service.py
+│   │   │   ├── dashboard_service.py
+│   │   │   ├── market_service.py
+│   │   │   ├── prediction_service.py
+│   │   │   └── stock_service.py
+│   │   ├── utils
+│   │   │   └── indicators.py
+│   │   ├── __init__.py
+│   │   └── main.py
+│   ├── .env
+│   ├── requirements.txt
+│   ├── run.py
+│   └── test_indicators.py
+├── database
+├── deployment
+├── docs
+├── frontend
+│   ├── public
+│   │   ├── favicon.svg
+│   │   └── icons.svg
+│   ├── src
+│   │   ├── assets
+│   │   │   ├── fonts
+│   │   │   ├── icons
+│   │   │   ├── images
+│   │   │   ├── hero.png
+│   │   │   └── vite.svg
+│   │   ├── components
+│   │   │   ├── charts
+│   │   │   │   ├── CandlestickChart.tsx
+│   │   │   │   ├── ChartToolbar.tsx
+│   │   │   │   ├── MACDChart.tsx
+│   │   │   │   └── RSIChart.tsx
+│   │   │   ├── common
+│   │   │   │   └── PageTitle.tsx
+│   │   │   ├── dashboard
+│   │   │   │   ├── InteractiveStockChart.tsx
+│   │   │   │   ├── MarketCard.tsx
+│   │   │   │   ├── MarketMovers.tsx
+│   │   │   │   ├── MarketStrip.tsx
+│   │   │   │   ├── PredictionCard.tsx
+│   │   │   │   ├── PredictionResult.tsx
+│   │   │   │   ├── PredictionSearch.tsx
+│   │   │   │   ├── SearchBar.tsx
+│   │   │   │   ├── StatsCard.tsx
+│   │   │   │   └── StockChart.tsx
+│   │   │   ├── layout
+│   │   │   │   ├── Navbar.tsx
+│   │   │   │   ├── Sidebar.tsx
+│   │   │   │   └── TopNavbar.tsx
+│   │   │   ├── portfolio
+│   │   │   ├── prediction
+│   │   │   ├── Stock
+│   │   │   │   ├── AIAdvisor.tsx
+│   │   │   │   ├── FinancialOverview.tsx
+│   │   │   │   ├── PortfolioModal.tsx
+│   │   │   │   ├── PredictionCard.tsx
+│   │   │   │   ├── StockDetailsPage.tsx
+│   │   │   │   ├── StockHero.tsx
+│   │   │   │   └── StockNews.tsx
+│   │   │   ├── ui
+│   │   │   │   ├── Badge.tsx
+│   │   │   │   ├── Button.tsx
+│   │   │   │   ├── Card.tsx
+│   │   │   │   ├── EmptyState.tsx
+│   │   │   │   └── Skeleton.tsx
+│   │   │   ├── watchlist
+│   │   │   ├── ProtectedRoute.tsx
+│   │   │   └── StockChart.tsx
+│   │   ├── config
+│   │   │   └── env.ts
+│   │   ├── constants
+│   │   │   ├── colors.ts
+│   │   │   └── routes.ts
+│   │   ├── contexts
+│   │   ├── features
+│   │   ├── hooks
+│   │   ├── layouts
+│   │   │   └── MainLayout.tsx
+│   │   ├── lib
+│   │   ├── pages
+│   │   │   ├── Alerts
+│   │   │   │   └── AlertsPage.tsx
+│   │   │   ├── Dashboard
+│   │   │   │   └── DashboardPage.tsx
+│   │   │   ├── History
+│   │   │   ├── NotFound
+│   │   │   ├── Portfolio
+│   │   │   │   ├── AIAdvisor.tsx
+│   │   │   │   ├── HoldingsTable.tsx
+│   │   │   │   ├── PortfolioAllocation.tsx
+│   │   │   │   ├── PortfolioHealth.tsx
+│   │   │   │   ├── PortfolioInsights.tsx
+│   │   │   │   ├── PortfolioPage.tsx
+│   │   │   │   ├── PortfolioPerformance.tsx
+│   │   │   │   └── PortfolioSummary.tsx
+│   │   │   ├── Prediction
+│   │   │   ├── Settings
+│   │   │   ├── Watchlist
+│   │   │   │   └── WatchlistPage.tsx
+│   │   │   ├── LoginPage.tsx
+│   │   │   └── RegisterPage.tsx
+│   │   ├── providers
+│   │   │   └── QueryProvider.tsx
+│   │   ├── routes
+│   │   │   └── AppRouter.tsx
+│   │   ├── services
+│   │   │   ├── alertService.ts
+│   │   │   ├── api.ts
+│   │   │   ├── authService.ts
+│   │   │   ├── chartService.ts
+│   │   │   ├── dashboardService.ts
+│   │   │   ├── portfolioService.ts
+│   │   │   ├── predictionService.ts
+│   │   │   ├── searchService.ts
+│   │   │   ├── stockService.ts
+│   │   │   └── watchlistService.ts
+│   │   ├── store
+│   │   ├── styles
+│   │   │   └── global.css
+│   │   ├── types
+│   │   │   └── prediction.ts
+│   │   ├── utils
+│   │   │   └── format.ts
+│   │   ├── App.tsx
+│   │   └── main.tsx
+│   ├── .env
+│   ├── .gitignore
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── README.md
+│   ├── tsconfig.app.json
+│   ├── tsconfig.json
+│   ├── tsconfig.node.json
+│   └── vite.config.ts
+├── screenshots
+├── tests
+├── .gitignore
+├── docker-compose.yml
+├── project_tree.py
+├── ProjectStructure.txt
+└── README.md
