@@ -9,42 +9,55 @@ class MarketService:
     Central service for fetching live market data.
     """
 
-    @staticmethod
-    def get_quote(symbol: str):
-        try:
-            df = yf.download(
-                symbol,
-                period="5d",
-                interval="1d",
-                progress=False,
-                auto_adjust=False,
-                threads=False,
-            )
+    import os
+    import requests
 
-            if df.empty:
+    class MarketService:
+
+        @staticmethod
+        def get_quote(symbol: str):
+            try:
+                api_key = os.getenv("FINNHUB_API_KEY")
+
+                # Map indices to Finnhub symbols
+                symbol_map = {
+                    "^GSPC": "^GSPC",
+                    "^IXIC": "^IXIC",
+                    "^DJI": "^DJI",
+                }
+
+                finnhub_symbol = symbol_map.get(symbol, symbol)
+
+                url = (
+                    f"https://finnhub.io/api/v1/quote"
+                    f"?symbol={finnhub_symbol}"
+                    f"&token={api_key}"
+                )
+
+                response = requests.get(url, timeout=10)
+                response.raise_for_status()
+
+                data = response.json()
+
+                if not data or data.get("c", 0) == 0:
+                    return None
+
+                current = data["c"]
+                previous = data["pc"]
+
+                change = current - previous
+                percent = (change / previous) * 100 if previous else 0
+
+                return {
+                    "symbol": symbol,
+                    "price": round(current, 2),
+                    "change": round(change, 2),
+                    "change_percent": round(percent, 2),
+                }
+
+            except Exception as e:
+                print(e)
                 return None
-
-            current = float(df["Close"].iloc[-1])
-
-            previous = (
-                float(df["Close"].iloc[-2])
-                if len(df) > 1
-                else current
-            )
-
-            change = current - previous
-            percent = (change / previous) * 100 if previous else 0
-
-            return {
-                "symbol": symbol,
-                "price": round(current, 2),
-                "change": round(change, 2),
-                "change_percent": round(percent, 2),
-            }
-
-        except Exception as e:
-            print(e)
-            return None
 
     @staticmethod
     def get_company_info(symbol: str):
@@ -204,7 +217,7 @@ class MarketService:
     @staticmethod
     def get_market_indices():
         return [
-            ("S&P 500", "^GSPC"),
-            ("NASDAQ", "^IXIC"),
-            ("Dow Jones", "^DJI"),
+            ("S&P 500 (SPY)", "SPY"),
+            ("NASDAQ (QQQ)", "QQQ"),
+            ("Dow Jones (DIA)", "DIA"),
         ]

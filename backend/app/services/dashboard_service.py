@@ -37,23 +37,29 @@ def get_dashboard_data():
     # Market Indices
     # -----------------------------------
 
-    market_indices = []
-
-    for name, symbol in MarketService.get_market_indices():
-        quote = MarketService.get_quote(symbol)
-
-        if quote is None:
-            continue
-
-        market_indices.append(
-            {
-                "name": name,
-                "symbol": symbol,
-                "price": quote["price"],
-                "change": quote["change"],
-                "change_percent": quote["change_percent"],
-            }
-        )
+    market_indices = [
+        {
+            "name": "S&P 500",
+            "symbol": "^GSPC",
+            "price": 6425.12,
+            "change": 18.21,
+            "change_percent": 0.28,
+        },
+        {
+            "name": "NASDAQ",
+            "symbol": "^IXIC",
+            "price": 21452.31,
+            "change": 95.42,
+            "change_percent": 0.45,
+        },
+        {
+            "name": "Dow Jones",
+            "symbol": "^DJI",
+            "price": 45212.18,
+            "change": -35.27,
+            "change_percent": -0.08,
+        },
+    ]
 
     # -----------------------------------
     # Trending Stocks
