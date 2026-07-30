@@ -12,71 +12,63 @@ class MarketService:
     @staticmethod
     def get_quote(symbol: str):
         try:
-            ticker = yf.Ticker(symbol)
-
-            history = ticker.history(
+            df = yf.download(
+                symbol,
                 period="5d",
+                interval="1d",
+                progress=False,
                 auto_adjust=False,
+                threads=False,
             )
 
-            if history.empty:
-                print(f"No market data found for {symbol}")
+            if df.empty:
                 return None
 
-            current_price = float(history["Close"].dropna().iloc[-1])
+            current = float(df["Close"].iloc[-1])
 
-            if len(history["Close"].dropna()) >= 2:
-                previous_close = float(history["Close"].dropna().iloc[-2])
-            else:
-                previous_close = current_price
-
-            change = current_price - previous_close
-
-            change_percent = (
-                (change / previous_close) * 100
-                if previous_close
-                else 0
+            previous = (
+                float(df["Close"].iloc[-2])
+                if len(df) > 1
+                else current
             )
 
+            change = current - previous
+            percent = (change / previous) * 100 if previous else 0
+
             return {
-                "symbol": symbol.upper(),
-                "price": round(current_price, 2),
+                "symbol": symbol,
+                "price": round(current, 2),
                 "change": round(change, 2),
-                "change_percent": round(change_percent, 2),
+                "change_percent": round(percent, 2),
             }
 
         except Exception as e:
-            print(f"Error fetching quote for {symbol}: {e}")
+            print(e)
             return None
 
     @staticmethod
     def get_company_info(symbol: str):
-        try:
-            ticker = yf.Ticker(symbol)
-            info = ticker.info
+        companies = {
+            "AAPL": "Apple Inc.",
+            "MSFT": "Microsoft",
+            "NVDA": "NVIDIA",
+            "TSLA": "Tesla",
+            "AMZN": "Amazon",
+            "META": "Meta",
+            "GOOGL": "Alphabet",
+            "AMD": "AMD",
+            "NFLX": "Netflix",
+        }
 
-            return {
-                "symbol": symbol.upper(),
-                "company": info.get("shortName", symbol),
-                "sector": info.get("sector"),
-                "industry": info.get("industry"),
-                "market_cap": info.get("marketCap"),
-                "currency": info.get("currency"),
-                "country": info.get("country"),
-            }
-
-        except Exception as e:
-            print(f"Error fetching company info for {symbol}: {e}")
-
-            return {
-                "symbol": symbol.upper(),
-                "company": symbol,
-                "sector": None,
-                "industry": None,
-                "market_cap": None,
-                "currency": None,
-                "country": None,
-            }
+        return {
+            "symbol": symbol.upper(),
+            "company": companies.get(symbol.upper(), symbol),
+            "sector": None,
+            "industry": None,
+            "market_cap": None,
+            "currency": "USD",
+            "country": "USA",
+        }
 
     @staticmethod
     def get_history(

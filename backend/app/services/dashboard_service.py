@@ -3,7 +3,7 @@ import time
 from app.services.market_service import MarketService
 _dashboard_cache = None
 _dashboard_cache_time = 0
-CACHE_TTL = 60  # seconds
+CACHE_TTL = 180  # seconds
 
 def get_dashboard_data():
     global _dashboard_cache
